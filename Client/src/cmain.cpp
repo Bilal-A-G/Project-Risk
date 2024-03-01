@@ -1,6 +1,7 @@
 #include <vector>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include "Camera/Camera.h"
 
 #include "Core/main.cpp"
 #include "iostream"
@@ -13,6 +14,7 @@
 Window* mainWindow;
 Shader shader;
 Mesh mesh;
+Camera camera;
 
 float height = 500;
 float width = 500;
@@ -50,15 +52,17 @@ void Start()
 	};
 
 	mesh.Create(vertices, indices);
-	mesh.SetProjection(glm::perspective(90.0f, height/width, 0.1f, 1000.0f));
-	mesh.SetView(view);
+	mesh.SetProjection(glm::perspective(95.0f, height/width, 0.1f, 1000.0f));
 	mesh.SetModel(model);
 }
 
 void Update() 
 {
+	mesh.SetView(view);
+
 	mainWindow->Update();
 	App::isRunning = !mainWindow->GetWindowShouldClose();
 
 	mesh.Draw(shader);
+	camera.Update(view, *mainWindow);
 }

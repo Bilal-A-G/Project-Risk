@@ -50,6 +50,27 @@ bool Window::GetWindowShouldClose()
 	return glfwWindowShouldClose(m_window);
 }
 
+bool Window::GetKeyDown(int keyCode)
+{
+	return glfwGetKey(m_window, keyCode) == GLFW_PRESS;
+}
+
+bool Window::GetMouseButtonDown(int mouseButton)
+{
+	return glfwGetMouseButton(m_window, mouseButton) == GLFW_PRESS;
+}
+
+
+void Window::SetCursorInputMode(int cursorState)
+{
+	glfwSetInputMode(m_window, GLFW_CURSOR, cursorState);
+}
+
+void Window::GetCursorPosition(double& x, double& y)
+{
+	glfwGetCursorPos(m_window, &x, &y);
+}
+
 void Window::Update()
 {
 	glfwPollEvents();
