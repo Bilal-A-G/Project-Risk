@@ -28,6 +28,10 @@ void Mesh::Create(std::vector<glm::vec3>& vertices, std::vector<int>& indices)
 void Mesh::Draw(Shader& shader)
 {
     shader.Bind();
+    shader.SetMatrixUniform("model", m_model);
+    shader.SetMatrixUniform("view", m_view);
+    shader.SetMatrixUniform("projection", m_projection);
+    
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, m_numIndices, GL_UNSIGNED_INT, nullptr);
 }

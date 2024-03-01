@@ -1,5 +1,6 @@
 ﻿#include "Shader.h"
-
+#include "glm/matrix.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include <iostream>
 
 #include "glad/glad.h"
@@ -70,6 +71,13 @@ unsigned Shader::ShaderTypeToGLType(ShaderType type)
     std::cout << "Error, could not recognize type of shader \n";
     return 0;
 }
+
+void Shader::SetMatrixUniform(const char* name, glm::mat4 matrix)
+{
+    int uniformLocation = glGetUniformLocation(m_shaderProgram, name);
+    glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
 
 void Shader::Bind()
 {
