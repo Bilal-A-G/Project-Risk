@@ -1,5 +1,6 @@
 workspace "Project Risk"
     architecture "x64"
+    startproject "Client"
 
     configurations
     {
