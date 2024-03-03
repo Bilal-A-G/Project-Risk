@@ -13,16 +13,18 @@
 
 Window* mainWindow;
 Shader shader;
-Mesh mesh;
+
+Mesh northAmerica;
+Mesh southAmerica;
+Mesh eurasia;
+Mesh africa;
+
 Camera camera;
 
 float height = 500;
 float width = 500;
 
-glm::mat4 model = glm::mat4(1);
-glm::mat4 view = glm::mat4(1);
-
-void Start() 
+void Start()
 {
 	mainWindow = new Window(width, height, "Window");
 	mainWindow->SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
@@ -34,35 +36,42 @@ void Start()
 	shader.Compile(fragSource, ShaderType::FRAGMENT);
 
 	shader.Link();
-	
-	model = glm::translate(model, glm::vec3(0.5f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(100.0f, 0.0f, 100.0f));
-	view = glm::translate(view, glm::vec3(0.0f, -2.0f, -2.0f));
+
 
 	std::vector<glm::vec3> vertices =
 	{
-		{-0.5f, 0.0f, -0.5f},
-		{0.5f, 0.0f, -0.5f},
-		{0.0f, 0.0f, 0.5f}
+		{0.0f,  0.0f, 0.0f},
+		{0.0f, 0.5f, 0.0f},
+		{0.5f, 0.0f, 0.0f},
+		{0.5f, 0.5f, 0.0f},
 	};
 
 	std::vector<int> indices =
 	{
-		0, 1, 2
+		0, 1, 2,
+		3, 1, 2,
 	};
 
-	mesh.Create(vertices, indices);
-	mesh.SetProjection(glm::perspective(95.0f, height/width, 0.1f, 1000.0f));
-	mesh.SetModel(model);
+	northAmerica.Create(vertices, indices);
+	southAmerica.Create(vertices, indices);
+	eurasia.Create(vertices, indices);
+	africa.Create(vertices, indices);
+
+	northAmerica.SetModel(glm::translate(glm::mat4(1), glm::vec3(-0.6, 0.3f, 0.0f)));
+	southAmerica.SetModel(glm::translate(glm::mat4(1), glm::vec3(-0.6, -0.5f, 0.0f)));
+	eurasia.SetModel(glm::translate(glm::mat4(1), glm::vec3(0.3, 0.3f, 0.0f)));
+	africa.SetModel(glm::translate(glm::mat4(1), glm::vec3(0.3, -0.6f, 0.0f)));
 }
 
 void Update() 
 {
-	mesh.SetView(view);
-
 	mainWindow->Update();
 	App::isRunning = !mainWindow->GetWindowShouldClose();
 
-	mesh.Draw(shader);
-	camera.Update(view, *mainWindow);
+	northAmerica.Draw(shader);
+	southAmerica.Draw(shader);
+	eurasia.Draw(shader);
+	africa.Draw(shader);
+
+	//camera.Update(view, *mainWindow);
 }

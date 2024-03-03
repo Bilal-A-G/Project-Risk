@@ -17,9 +17,11 @@ public:
     void SetModel(glm::mat4 model){m_model = model;}
 private:
     unsigned int m_VAO;
+    unsigned int m_VBO;
+    unsigned int m_EBO;
     int m_numIndices;
     
-    glm::mat4 m_model;
-    glm::mat4 m_view;
-    glm::mat4 m_projection;
+    glm::mat4 m_model = glm::mat4(1);
+    glm::mat4 m_view = glm::mat4(1);
+    glm::mat4 m_projection = glm::mat4(1);
 };

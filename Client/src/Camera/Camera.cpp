@@ -43,8 +43,28 @@ void Camera::Update(glm::mat4& viewMatrix, Window& window)
     if(mouseDown)
     {
         window.SetCursorInputMode(GLFW_CURSOR_DISABLED);
-        viewMatrix = glm::rotate(viewMatrix,  static_cast<float>(mouseDeltaX * mouseSensitivity),  glm::vec3(0.0f, 1.0f, 0.0f));
-        viewMatrix = glm::rotate(viewMatrix,  static_cast<float>(mouseDeltaY * mouseSensitivity), m_right);
+        float rotationAmountX = static_cast<float>(mouseDeltaX * mouseSensitivity);
+        float rotationAmountY = static_cast<float>(mouseDeltaY * mouseSensitivity);
+
+        // upAngle += rotationAmountY;
+        //
+        // if(upAngle >= 1.0f)
+        // {
+        //     rotationAmountY = 0.0f;
+        //     upAngle = 1.0f;
+        // }
+        // else if(upAngle <= -1.0f)
+        // {
+        //     rotationAmountY = 0.0f;
+        //     upAngle = -1.0f;
+        // }
+        
+        viewMatrix = glm::rotate(viewMatrix, rotationAmountX,  m_up);
+        viewMatrix = glm::rotate(viewMatrix, rotationAmountY, m_right);
+        
+        //m_forward = glm::vec3(viewMatrix * glm::vec4(m_forward, 0.0f));
+        //m_right = glm::cross(m_forward, glm::vec3(0.0f, 1.0f, 0.0f));
+        //m_up = glm::cross(m_forward, m_right);
     }
     else
     {
