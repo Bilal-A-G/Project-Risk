@@ -4,15 +4,15 @@
 
 class Player
 {
-public:
-    bool isTurn;
-    int numTerrCrtl;
-    int numOfArmies;
-    std::vector<Territory*> territories;
+    public:
+        bool isTurn;
+        int numTerrCrtl;
+        int numOfArmies;
+        std::vector<Territory*> territories;
     
-    void Reinforcement();
+        void Reinforcement();
 
-    void Attack();
+        void Attack();
 
-    void Fortificate();
+        void Fortificate();
 };
