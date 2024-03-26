@@ -2,6 +2,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include "vector"
+#include "string";
 
 class Shader;
 
@@ -9,7 +10,7 @@ class Mesh
 {
 public:
     Mesh() = default;
-    void Create(std::vector<glm::vec3>& vertices, std::vector<int>& indices);
+    void Create(std::vector<float>& bufferData, std::vector<int>& indices, std::string texturePath);
     void Draw(Shader& shader);
     
     void SetView(glm::mat4 view){m_view = view;}
@@ -19,6 +20,7 @@ private:
     unsigned int m_VAO;
     unsigned int m_VBO;
     unsigned int m_EBO;
+    unsigned int m_texture;
     int m_numIndices;
     
     glm::mat4 m_model = glm::mat4(1);
