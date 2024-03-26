@@ -12,8 +12,8 @@ public:
     std::vector<Territory*> territories;
 
     
-    void Reinforcement();
-    void Attack();
-    void Fortificate();
+    void Reinforcement() {};
+    void Attack() {};
+    void Fortificate() {};
     
 };
