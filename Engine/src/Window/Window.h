@@ -19,9 +19,10 @@ public:
 	bool GetMouseButtonDown(int mouseButton);
 	void SetCursorInputMode(int cursorState);
 	void GetCursorPosition(double& x, double& y);
+public:
+	int width;
+	int height;
 private:
-	int m_width;
-	int m_height;
 	float clearColourR;
 	float clearColourG;
 	float clearColourB;

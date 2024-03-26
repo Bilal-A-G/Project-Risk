@@ -10,9 +10,6 @@ void OnResize(GLFWwindow* window, int width, int height)
 
 Window::Window(int width, int height, const char* name) 
 {
-	m_width = width;
-	m_height = height;
-
 	if (!glfwInit()) {
 		std::cout << "Error, failed to initialize GLFW library \n";
 	}
@@ -83,4 +80,6 @@ void Window::Update()
 
 	glClearColor(clearColourR, clearColourG, clearColourB, clearColourA);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glfwGetWindowSize(m_window, &width, &height);
 }
