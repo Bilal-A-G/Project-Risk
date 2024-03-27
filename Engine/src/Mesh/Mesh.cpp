@@ -16,24 +16,7 @@ void Mesh::Create(std::vector<float>& bufferData, std::vector<int>& indices, std
     glGenBuffers(1, &m_VBO);
     glGenBuffers(1, &m_EBO);
 
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load((TEXTURE_DIR + texturePath + TEXTURE_FILE_EXTENSION).c_str(), &width, &height, &nrChannels, 0);
-
-    if (data != nullptr) 
-    {
-        glGenTextures(1, &m_texture);
-        glBindTexture(GL_TEXTURE_2D, m_texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        std::cout << "Successfully loaded image at " << TEXTURE_DIR + texturePath + TEXTURE_FILE_EXTENSION << "\n";
-    }
-    else
-    {
-        std::cout << "Failed to load image at " << TEXTURE_DIR + texturePath + TEXTURE_FILE_EXTENSION << "\n";
-    }
-
-    stbi_image_free(data);
+    this->SetTexture(texturePath);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * bufferData.size(), bufferData.data(), GL_STATIC_DRAW);  // NOLINT(bugprone-sizeof-container)
@@ -48,6 +31,28 @@ void Mesh::Create(std::vector<float>& bufferData, std::vector<int>& indices, std
     glEnableVertexAttribArray(1);
 
     m_numIndices = static_cast<int>(indices.size());
+}
+
+void Mesh::SetTexture(std::string texturePath)
+{
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load((TEXTURE_DIR + texturePath + TEXTURE_FILE_EXTENSION).c_str(), &width, &height, &nrChannels, 0);
+
+    if (data != nullptr)
+    {
+        glGenTextures(1, &m_texture);
+        glBindTexture(GL_TEXTURE_2D, m_texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        std::cout << "Successfully loaded image at " << TEXTURE_DIR + texturePath + TEXTURE_FILE_EXTENSION << "\n";
+    }
+    else
+    {
+        std::cout << "Failed to load image at " << TEXTURE_DIR + texturePath + TEXTURE_FILE_EXTENSION << "\n";
+    }
+
+    stbi_image_free(data);
 }
 
 void Mesh::Draw(Shader& shader)

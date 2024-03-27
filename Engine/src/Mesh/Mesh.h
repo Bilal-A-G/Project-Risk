@@ -16,6 +16,8 @@ public:
     void SetView(glm::mat4 view){m_view = view;}
     void SetProjection(glm::mat4 projection){m_projection = projection;}
     void SetModel(glm::mat4 model){m_model = model;}
+
+    void SetTexture(std::string texturePath);
 private:
     unsigned int m_VAO;
     unsigned int m_VBO;
