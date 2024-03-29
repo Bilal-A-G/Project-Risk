@@ -1,7 +1,5 @@
 ﻿#pragma once
 #include <vector>
-
-class Territory;
 #include "../Territories/Territories.h"
 
 class Player
@@ -9,11 +7,12 @@ class Player
 public:
     bool isTurn;
     int numTerrCrtl;
+    int numOfArmies;
     std::vector<Territory*> territories;
 
     
-    void Reinforcement() {};
-    void Attack() {};
-    void Fortificate() {};
+    void Reinforcement();
+    void Attack();
+    void Fortificate();
     
 };

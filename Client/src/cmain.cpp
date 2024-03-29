@@ -47,11 +47,23 @@ bool threePicked = false;
 bool fourPicked = false;
 bool fivePicked = false;
 bool sixPicked = false;
+bool boardIsLoaded = false;
+bool hasEnoughArmies = false;
+bool skippedAttackPhase = false;
 
 int countryCount;
+int diceNum;
+int attackerDiceRolls;
+int defenderDiceRolls;
 int numOfArmies;
 int numOfArmiesChosen;
+int enemyRegionsAround = 0;
 string chosenRegion;
+
+Regions* defendingRegion;
+Regions* attackingRegion;
+
+Territory* TerritoryToRemoveFrom;
 
 std::vector<Mesh> territoryMeshes;
 
@@ -307,6 +319,8 @@ void CreateBoard()
 
 	map.Create(bufferData, indices, "map");
 	SetUpTerritories(bufferData, indices);
+
+	boardIsLoaded = true;
 }
 
 void Start()
@@ -325,146 +339,146 @@ void Start()
 	
 	*/
 
-	//cout << "Please write a number of players between 2 to 4: \n";
-	//cin >> playerCount;
+	cout << "Please write a number of players between 2 to 4: \n";
+	cin >> playerCount;
 
-	//if (playerCount < 2)
-	//{
-	//	playerCount = 2;
-	//}
-	//else if (playerCount > 4)
-	//{
-	//	playerCount = 4;
-	//}
+	if (playerCount < 2)
+	{
+		playerCount = 2;
+	}
+	else if (playerCount > 4)
+	{
+		playerCount = 4;
+	}
 
-	//for (int i = 1; i <= playerCount; ++i)
-	//{
-	//	players.push_back(new Player());
-	//}
+	for (int i = 1; i <= playerCount; ++i)
+	{
+		players.push_back(new Player());
+	}
 
-	//for (int i = 1; i <= players.size(); ++i)
-	//{
-	//	int territoryNum = rand() % 6 + 1;
+	for (int i = 1; i <= players.size(); ++i)
+	{
+		int territoryNum = rand() % 6 + 1;
 
-	//	switch (territoryNum)
-	//	{
-	//		case 1:
-	//			if (onePicked == false)
-	//			{
-	//				for (Territory* j : territories)
-	//				{
-	//					if (j->name == "NorthAmerica")
-	//					{
-	//						j->playerInControl = i;
-	//						players[i - 1]->territories.insert(players[i - 1]->territories.end(), {NorthAmerica});
-	//					}
-	//				}
+		switch (territoryNum)
+		{
+			case 1:
+				if (onePicked == false)
+				{
+					for (Territory* j : territories)
+					{
+						if (j->name == "NorthAmerica")
+						{
+							j->playerInControl = i;
+							players[i - 1]->territories.insert(players[i - 1]->territories.end(), {NorthAmerica});
+						}
+					}
 
-	//				onePicked = true; // makes sure nortAmerica doesn't get assigned to more than one person
-	//			}
-	//			else
-	//			{
-	//				i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
-	//				break;
-	//			}
-	//			break;
-	//		case 2:
-	//			if (twoPicked == false)
-	//			{
-	//				for (Territory* j : territories)
-	//				{
-	//					if (j->name == "SouthAmerica")
-	//					{
-	//						j->playerInControl = i;
-	//						players[i - 1]->territories.insert(players[i - 1]->territories.end(), {SouthAmerica});
-	//					}
-	//				}
-	//				twoPicked = true; // makes sure southAmerica doesn't get assigned to more than one person
-	//			}
-	//			else
-	//			{
-	//				i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
-	//				break;
-	//			}
-	//			break;
-	//		case 3:
-	//			if (threePicked == false)
-	//			{
-	//				for (Territory* j : territories)
-	//				{
-	//					if (j->name == "Europe")
-	//					{
-	//						j->playerInControl = i;
-	//						players[i - 1]->territories.insert(players[i - 1]->territories.end(), {Europe});
-	//					}
-	//				}
-	//				threePicked = true; // makes sure eurasia doesn't get assigned to more than one person
-	//			}
-	//			else
-	//			{
-	//				i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
-	//				break;
-	//			}
-	//			break;
-	//		case 4:
-	//			if (fourPicked == false)
-	//			{
-	//				for (Territory* j : territories)
-	//				{
-	//					if (j->name == "Asia")
-	//					{
-	//						j->playerInControl = i;
-	//						players[i - 1]->territories.insert(players[i - 1]->territories.end(), {Asia});
-	//					}
-	//				}
-	//				fourPicked = true; // makes sure africa doesn't get assigned to more than one person
-	//			}
-	//			else
-	//			{
-	//				i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
-	//				break;
-	//			}
-	//			break;
-	//		case 5:
-	//			if (fivePicked == false)
-	//			{
-	//				for (Territory* j : territories)
-	//				{
-	//					if (j->name == "Oceania")
-	//					{
-	//						j->playerInControl = i;
-	//						players[i - 1]->territories.insert(players[i - 1]->territories.end(), {Oceania});
-	//					}
-	//				}
-	//				fivePicked = true; // makes sure africa doesn't get assigned to more than one person
-	//			}
-	//			else
-	//			{
-	//				i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
-	//				break;
-	//			}
-	//			break;
-	//		case 6:
-	//			if (sixPicked == false)
-	//			{
-	//				for (Territory* j : territories)
-	//				{
-	//					if (j->name == "Africa")
-	//					{
-	//						j->playerInControl = i;
-	//						players[i - 1]->territories.insert(players[i - 1]->territories.end(), {Africa});
-	//					}
-	//				}
-	//				sixPicked = true; // makes sure africa doesn't get assigned to more than one person
-	//			}
-	//			else
-	//			{
-	//				i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
-	//				break;
-	//			}
-	//			break;
-	//	}
-	//}
+					onePicked = true; // makes sure nortAmerica doesn't get assigned to more than one person
+				}
+				else
+				{
+					i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
+					break;
+				}
+				break;
+			case 2:
+				if (twoPicked == false)
+				{
+					for (Territory* j : territories)
+					{
+						if (j->name == "SouthAmerica")
+						{
+							j->playerInControl = i;
+							players[i - 1]->territories.insert(players[i - 1]->territories.end(), {SouthAmerica});
+						}
+					}
+					twoPicked = true; // makes sure southAmerica doesn't get assigned to more than one person
+				}
+				else
+				{
+					i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
+					break;
+				}
+				break;
+			case 3:
+				if (threePicked == false)
+				{
+					for (Territory* j : territories)
+					{
+						if (j->name == "Europe")
+						{
+							j->playerInControl = i;
+							players[i - 1]->territories.insert(players[i - 1]->territories.end(), {Europe});
+						}
+					}
+					threePicked = true; // makes sure eurasia doesn't get assigned to more than one person
+				}
+				else
+				{
+					i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
+					break;
+				}
+				break;
+			case 4:
+				if (fourPicked == false)
+				{
+					for (Territory* j : territories)
+					{
+						if (j->name == "Asia")
+						{
+							j->playerInControl = i;
+							players[i - 1]->territories.insert(players[i - 1]->territories.end(), {Asia});
+						}
+					}
+					fourPicked = true; // makes sure africa doesn't get assigned to more than one person
+				}
+				else
+				{
+					i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
+					break;
+				}
+				break;
+			case 5:
+				if (fivePicked == false)
+				{
+					for (Territory* j : territories)
+					{
+						if (j->name == "Oceania")
+						{
+							j->playerInControl = i;
+							players[i - 1]->territories.insert(players[i - 1]->territories.end(), {Oceania});
+						}
+					}
+					fivePicked = true; // makes sure africa doesn't get assigned to more than one person
+				}
+				else
+				{
+					i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
+					break;
+				}
+				break;
+			case 6:
+				if (sixPicked == false)
+				{
+					for (Territory* j : territories)
+					{
+						if (j->name == "Africa")
+						{
+							j->playerInControl = i;
+							players[i - 1]->territories.insert(players[i - 1]->territories.end(), {Africa});
+						}
+					}
+					sixPicked = true; // makes sure africa doesn't get assigned to more than one person
+				}
+				else
+				{
+					i--; // if the number was already picked, reset i so that it doesn't skip over the player and assigns a new number
+					break;
+				}
+				break;
+		}
+	}
 
 	//for (Territory* i : territories)
 	//{
@@ -490,58 +504,77 @@ void Update()
 
 	//camera.Update(view, *mainWindow);
 
-	//switch (playerTurn)
-	//{
-	//	case 0: // player 1 turn
-	//		cout << "\nPlayer 1's Turn.\n";
-	//		players[0]->Reinforcement();
-	//		players[0]->Attack();
-	//		players[0]->Fortificate();
+	if (boardIsLoaded == true)
+	{
+		switch (playerTurn)
+		{
+			case 0: // player 1 turn
+				cout << "\nPlayer 1's Turn.\n";
+				players[0]->Reinforcement();
+				players[0]->Attack();
 
-	//		playerTurn = 1; // set to player 2 turn
-	//		
-	//		break;
-	//	case 1: // player 2 turn
-	//		cout << "\nPlayer 2's Turn.\n";
-	//		players[1]->Reinforcement();
-	//		players[1]->Attack();
-	//		players[1]->Fortificate();
+				if (skippedAttackPhase == true)
+				{
+					players[0]->Fortificate();
+				}
 
-	//		if (playerCount > 2)
-	//		{
-	//			playerTurn = 2; // set to player 3 turn
-	//		}
-	//		else
-	//		{
-	//			playerTurn = 0; // set to player 1 turn if there is no player 3
-	//		}
-	//		
-	//		break;
-	//	case 2: // player 3 turn
-	//		cout << "\nPlayer 3's Turn.\n";
-	//		players[2]->Reinforcement();
-	//		players[2]->Attack();
-	//		players[2]->Fortificate();
+				playerTurn = 1; // set to player 2 turn
 
-	//		if (playerCount > 3)
-	//		{
-	//			playerTurn = 3; // set to player 4 turn
-	//		}
-	//		else
-	//		{
-	//			playerTurn = 0; // set to player 1 turn if there is no player 4
-	//		}
+				break;
+			case 1: // player 2 turn
+				cout << "\nPlayer 2's Turn.\n";
+				players[1]->Reinforcement();
+				players[1]->Attack();
+				
+				if (skippedAttackPhase == true)
+				{
+					players[1]->Fortificate();
+				}
 
-	//		break;
-	//	case 3: // player 4 turn
-	//		cout << "\nPlayer 4's Turn.\n";
-	//		players[3]->Reinforcement();
-	//		players[3]->Attack();
-	//		players[3]->Fortificate();
+				if (playerCount > 2)
+				{
+					playerTurn = 2; // set to player 3 turn
+				}
+				else
+				{
+					playerTurn = 0; // set to player 1 turn if there is no player 3
+				}
 
-	//		playerTurn = 0; // set to player 1 turn
-	//		break;
-	//}
+				break;
+			case 2: // player 3 turn
+				cout << "\nPlayer 3's Turn.\n";
+				players[2]->Reinforcement();
+				players[2]->Attack();
+				
+				if (skippedAttackPhase == true)
+				{
+					players[2]->Fortificate();
+				}
+
+				if (playerCount > 3)
+				{
+					playerTurn = 3; // set to player 4 turn
+				}
+				else
+				{
+					playerTurn = 0; // set to player 1 turn if there is no player 4
+				}
+
+				break;
+			case 3: // player 4 turn
+				cout << "\nPlayer 4's Turn.\n";
+				players[3]->Reinforcement();
+				players[3]->Attack();
+
+				if (skippedAttackPhase == true)
+				{
+					players[3]->Fortificate();
+				}
+
+				playerTurn = 0; // set to player 1 turn
+				break;
+		}
+	}
 }
 
 void TerritorySetup()
@@ -550,125 +583,199 @@ void TerritorySetup()
 	NorthAmerica->name = "NorthAmerica";
 	Regions* Alaska = new Regions();
 	Alaska->name = "Alaska";
+	Alaska->SetOwnedTerritory(NorthAmerica);
 	Regions* NorthwestTerritory = new Regions();
 	NorthwestTerritory->name = "NorthwestTerritory";
+	NorthwestTerritory->SetOwnedTerritory(NorthAmerica);
 	Regions* Greenland = new Regions();
 	Greenland->name = "Greenland";
+	Greenland->SetOwnedTerritory(NorthAmerica);
 	Regions* Alberta = new Regions();
 	Alberta->name = "Alberta";
+	Alberta->SetOwnedTerritory(NorthAmerica);
 	Regions* Ontario = new Regions();
 	Ontario->name = "Ontario";
+	Ontario->SetOwnedTerritory(NorthAmerica);
 	Regions* Quebec = new Regions();
 	Quebec->name = "Quebec";
+	Quebec->SetOwnedTerritory(NorthAmerica);
 	Regions* WesternUnitedStates = new Regions();
 	WesternUnitedStates->name = "WesternUnitedStates";
+	WesternUnitedStates->SetOwnedTerritory(NorthAmerica);
 	Regions* EasternUnitedStates = new Regions();
 	EasternUnitedStates->name = "EasternUnitedStates";
+	EasternUnitedStates->SetOwnedTerritory(NorthAmerica);
 	Regions* CentralAmerica = new Regions();
 	CentralAmerica->name = "CentralAmerica";
+	CentralAmerica->SetOwnedTerritory(NorthAmerica);
 	Regions* EasternCanada = new Regions();
 	EasternCanada->name = "EasternCanada";
+	EasternCanada->SetOwnedTerritory(NorthAmerica);
 
 	NorthAmerica->regions.insert(NorthAmerica->regions.end(), 
 		{Alaska, NorthwestTerritory, Greenland, Alberta, Ontario, Quebec, WesternUnitedStates, EasternUnitedStates, CentralAmerica, EasternCanada});
+
+	for (Regions* k : NorthAmerica->regions)
+	{
+		k->playerInControl = NorthAmerica->playerInControl;
+	}
 
 	// South America
 	SouthAmerica->name = "SouthAmerica";
 	Regions* Venezuela = new Regions();
 	Venezuela->name = "Venezuela";
+	Venezuela->SetOwnedTerritory(SouthAmerica);
 	Regions* Peru = new Regions();
 	Peru->name = "Peru";
+	Peru->SetOwnedTerritory(SouthAmerica);
 	Regions* Brazil = new Regions();
 	Brazil->name = "Brazil";
+	Brazil->SetOwnedTerritory(SouthAmerica);
 	Regions* Argentina = new Regions();
 	Argentina->name = "Argentina";
+	Argentina->SetOwnedTerritory(SouthAmerica);
 
 	SouthAmerica->regions.insert(SouthAmerica->regions.end(),
 		{Venezuela, Peru, Brazil, Argentina});
+
+	for (Regions* k : SouthAmerica->regions)
+	{
+		k->playerInControl = SouthAmerica->playerInControl;
+	}
 
 	// Africa
 	Africa->name = "Africa";
 	Regions* NorthAfrica = new Regions();
 	NorthAfrica->name = "NorthAfrica";
+	NorthAfrica->SetOwnedTerritory(Africa);
 	Regions* Egypt = new Regions();
 	Egypt->name = "Egypt";
+	Egypt->SetOwnedTerritory(Africa);
 	Regions* EastAfrica = new Regions();
 	EastAfrica->name = "EastAfrica";
+	EastAfrica->SetOwnedTerritory(Africa);
 	Regions* SouthAfrica = new Regions();
 	SouthAfrica->name = "SouthAfrica";
+	SouthAfrica->SetOwnedTerritory(Africa);
 	Regions* Madagascar = new Regions();
 	Madagascar->name = "Madagascar";
+	Madagascar->SetOwnedTerritory(Africa);
 	Regions* CentralAfrica = new Regions();
 	CentralAfrica->name = "CentralAfrica";
+	CentralAfrica->SetOwnedTerritory(Africa);
 
 	Africa->regions.insert(Africa->regions.end(),
 		{NorthAfrica, Egypt, EastAfrica, CentralAfrica, SouthAfrica, Madagascar});
+
+	for (Regions* k : Africa->regions)
+	{
+		k->playerInControl = Africa->playerInControl;
+	}
 
 	// Europe
 	Europe->name = "Europe";
 	Regions* Iceland = new Regions();
 	Iceland->name = "Iceland";
+	Iceland->SetOwnedTerritory(Europe);
 	Regions* Scandinavia = new Regions();
 	Scandinavia->name = "Scandinavia";
+	Scandinavia->SetOwnedTerritory(Europe);
 	Regions* GreatBritain = new Regions();
 	GreatBritain->name = "GreatBritain";
+	GreatBritain->SetOwnedTerritory(Europe);
 	Regions* NorthernEurope = new Regions();
 	NorthernEurope->name = "NorthernEurope";
+	NorthernEurope->SetOwnedTerritory(Europe);
 	Regions* SouthernEurope = new Regions();
 	SouthernEurope->name = "SouthernEurope";
+	SouthernEurope->SetOwnedTerritory(Europe);
 	Regions* WesternEurope = new Regions();
 	WesternEurope->name = "WesternEurope";
+	WesternEurope->SetOwnedTerritory(Europe);
 	Regions* Russia = new Regions();
 	Russia->name = "Russia";
+	Russia->SetOwnedTerritory(Europe);
 
 	Europe->regions.insert(Europe->regions.end(),
 		{Iceland, Scandinavia, Russia, GreatBritain, NorthernEurope, SouthernEurope, WesternEurope});
+
+	for (Regions* k : Europe->regions)
+	{
+		k->playerInControl = Europe->playerInControl;
+	}
 
 	// Oceania
 	Oceania->name = "Oceania";
 	Regions* Indonesia = new Regions();
 	Indonesia->name = "Indonesia";
+	Indonesia->SetOwnedTerritory(Oceania);
 	Regions* NewGuinea = new Regions();
 	NewGuinea->name = "NewGuinea";
+	NewGuinea->SetOwnedTerritory(Oceania);
 	Regions* WesternAustralia = new Regions();
 	WesternAustralia->name = "WesternAustralia";
+	WesternAustralia->SetOwnedTerritory(Oceania);
 	Regions* EasternAustralia = new Regions();
 	EasternAustralia->name = "EasternAustralia";
+	EasternAustralia->SetOwnedTerritory(Oceania);
 
 	Oceania->regions.insert(Oceania->regions.end(),
 		{Indonesia, NewGuinea, WesternAustralia, EasternAustralia});
+
+	for (Regions* k : Oceania->regions)
+	{
+		k->playerInControl = Oceania->playerInControl;
+	}
 
 	// Asia
 	Asia->name = "Asia";
 	Regions* Siam = new Regions();
 	Siam->name = "Siam";
+	Siam->SetOwnedTerritory(Asia);
 	Regions* India = new Regions();
 	India->name = "India";
+	India->SetOwnedTerritory(Asia);
 	Regions* China = new Regions();
 	China->name = "China";
+	China->SetOwnedTerritory(Asia);
 	Regions* Mongolia = new Regions();
 	Mongolia->name = "Mongolia";
+	Mongolia->SetOwnedTerritory(Asia);
 	Regions* Japan = new Regions();
 	Japan->name = "Japan";
+	Japan->SetOwnedTerritory(Asia);
 	Regions* Irkutsk = new Regions();
 	Irkutsk->name = "Irkutsk";
+	Irkutsk->SetOwnedTerritory(Asia);
 	Regions* Yakutsk = new Regions();
 	Yakutsk->name = "Yakutsk";
+	Yakutsk->SetOwnedTerritory(Asia);
 	Regions* Kamchatka = new Regions();
 	Kamchatka->name = "Kamchatka";
+	Kamchatka->SetOwnedTerritory(Asia);
 	Regions* Siberia = new Regions();
 	Siberia->name = "Siberia";
+	Siberia->SetOwnedTerritory(Asia);
 	Regions* Afghanistan = new Regions();
 	Afghanistan->name = "Afghanistan";
+	Afghanistan->SetOwnedTerritory(Asia);
 	Regions* Ural = new Regions();
 	Ural->name = "Ural";
+	Ural->SetOwnedTerritory(Asia);
 	Regions* MiddleEast = new Regions();
 	MiddleEast->name = "MiddleEast";
+	MiddleEast->SetOwnedTerritory(Asia);
 	Regions* SoutheastAsia = new Regions();
 	SoutheastAsia->name = "SoutheastAsia";
+	SoutheastAsia->SetOwnedTerritory(Asia);
 
 	Asia->regions.insert(Asia->regions.end(),
 		{Siam, India, China, Mongolia, Japan, Irkutsk, Yakutsk, Kamchatka, Siberia, Afghanistan, Ural, MiddleEast, SoutheastAsia});
+
+	for (Regions* k : Asia->regions)
+	{
+		k->playerInControl = Asia->playerInControl;
+	}
 
 	// Adding Territories to Vector
 
@@ -811,4 +918,893 @@ void TerritorySetup()
 
 	EasternAustralia->adjacentRegions.insert(EasternAustralia->adjacentRegions.end(),
 		{WesternAustralia, NewGuinea});
+}
+
+void Player::Reinforcement()
+{
+	switch (playerTurn)
+	{
+		case 0:
+			countryCount = 0;
+
+			for (Territory* i : players[0]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					countryCount++;
+				}
+			}
+
+			players[0]->numOfArmies += floor(countryCount / 3);
+
+			cout << "Choose which region you wish to assign your armies to: \n";
+
+			for (Territory* i : players[0]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					cout << j->name << '\n';
+				}
+			}
+
+			cin >> chosenRegion;
+
+			cout << "\nChoose a number of armies you wish to assign out of " << players[0]->numOfArmies << ": \n";
+
+			cin >> numOfArmiesChosen;
+
+			players[0]->numOfArmies -= numOfArmiesChosen;
+
+			for (Territory* i : players[0]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					if (j->name == chosenRegion)
+					{
+						j->numOfArmies += numOfArmiesChosen;
+					}
+				}
+			}
+
+			break;
+		case 1:
+			countryCount = 0;
+
+			for (Territory* i : players[1]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					countryCount++;
+				}
+			}
+
+			players[1]->numOfArmies += floor(countryCount / 3);
+
+			cout << "Choose which region you wish to assign your armies to: \n";
+
+			for (Territory* i : players[1]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					cout << j->name << '\n';
+				}
+			}
+
+			cin >> chosenRegion;
+
+			cout << "\nChoose a number of armies you wish to assign out of " << players[1]->numOfArmies << ": \n";
+
+			cin >> numOfArmiesChosen;
+
+			players[1]->numOfArmies -= numOfArmiesChosen;
+
+			for (Territory* i : players[1]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					if (j->name == chosenRegion)
+					{
+						j->numOfArmies += numOfArmiesChosen;
+					}
+				}
+			}
+			break;
+		case 2:
+			countryCount = 0;
+
+			for (Territory* i : players[2]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					countryCount++;
+				}
+			}
+
+			players[2]->numOfArmies += floor(countryCount / 3);
+
+			cout << "Choose which region you wish to assign your armies to: \n";
+
+			for (Territory* i : players[2]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					cout << j->name << '\n';
+				}
+			}
+
+			cin >> chosenRegion;
+
+			cout << "\nChoose a number of armies you wish to assign out of " << players[2]->numOfArmies << ": \n";
+
+			cin >> numOfArmiesChosen;
+
+			players[2]->numOfArmies -= numOfArmiesChosen;
+
+			for (Territory* i : players[2]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					if (j->name == chosenRegion)
+					{
+						j->numOfArmies += numOfArmiesChosen;
+					}
+				}
+			}
+			break;
+		case 3:
+			countryCount = 0;
+
+			for (Territory* i : players[3]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					countryCount++;
+				}
+			}
+
+			players[3]->numOfArmies += floor(countryCount / 3);
+
+			cout << "Choose which region you wish to assign your armies to: \n";
+
+			for (Territory* i : players[3]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					cout << j->name << '\n';
+				}
+			}
+
+			cin >> chosenRegion;
+
+			cout << "\nChoose a number of armies you wish to assign out of " << players[3]->numOfArmies << ": \n";
+
+			cin >> numOfArmiesChosen;
+
+			players[3]->numOfArmies -= numOfArmiesChosen;
+
+			for (Territory* i : players[3]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					if (j->name == chosenRegion)
+					{
+						j->numOfArmies += numOfArmiesChosen;
+					}
+				}
+			}
+			break;
+	}
+}
+
+void Player::Attack()
+{
+	skippedAttackPhase = false;
+
+	switch (playerTurn)
+	{
+		case 0:
+			hasEnoughArmies = false;
+
+			cout << "Choose which of these countries you wish to attack with:\n";
+
+			for (Territory* i : players[0]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					if (j->numOfArmies > 1)
+					{
+						cout << j->name << endl;
+						hasEnoughArmies = true;
+					}
+				}
+			}
+
+			if (hasEnoughArmies == true)
+			{
+				cin >> chosenRegion;
+
+				for (Territory* i : players[0]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						if (j->name == chosenRegion)
+						{
+							attackingRegion = j;
+						}
+					}
+				}
+
+				enemyRegionsAround = 0;
+
+				for (Regions* i : attackingRegion->adjacentRegions)
+				{
+					if (i->playerInControl != attackingRegion->playerInControl)  ////// ISSUE IS AROUND HERE BILAL
+					{
+						enemyRegionsAround += 1;
+					}
+				}
+
+				if (enemyRegionsAround == 0)
+				{
+					cout << "\nThere are no enemy countries near your chosen country, skipping to the Fortification phase.\n";
+					skippedAttackPhase = true;
+					break;
+				}
+
+				for (Territory* i : players[0]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						if (j->name == chosenRegion)
+						{
+							cout << "Choose an adjacent enemy country to attack:\n";
+
+							for (Regions* k : j->adjacentRegions)
+							{
+								if (k->playerInControl != 1) 
+								{
+									cout << k->name << endl;
+								}
+							}
+						}
+					}
+				}
+
+				cin >> chosenRegion;
+
+				for (Territory* i : players[0]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						for (Regions* k : j->adjacentRegions)
+						{
+							if (k->name == chosenRegion)
+							{
+								defendingRegion = k;
+							}
+						}
+					}
+				}
+
+				if (defendingRegion->numOfArmies == 0)
+				{
+					cout << "\n" << defendingRegion->name << " successfully taken!\n";
+					defendingRegion->playerInControl = (playerTurn + 1);
+
+					for (Territory* i : players[0]->territories)
+					{
+						for (Regions* j : i->regions)
+						{
+							if (j == defendingRegion)
+							{
+								TerritoryToRemoveFrom = defendingRegion->returnOwnedTerritory();
+								auto element = find(TerritoryToRemoveFrom->regions.begin(), TerritoryToRemoveFrom->regions.end(), j);
+								int index = element - TerritoryToRemoveFrom->regions.begin();
+
+								TerritoryToRemoveFrom->regions.erase(TerritoryToRemoveFrom->regions.begin() + index);
+							}
+						}
+					}
+
+					defendingRegion->SetOwnedTerritory(attackingRegion->returnOwnedTerritory());
+					attackingRegion->returnOwnedTerritory()->regions.insert(attackingRegion->returnOwnedTerritory()->regions.end(), defendingRegion);
+
+				}
+				else
+				{
+					while (defendingRegion->numOfArmies != 0 || attackingRegion->numOfArmies != 0)
+					{
+						cout << "\nPlayer " << (playerTurn + 1) << ", pick a number of up to 3 dice to attack!\n";
+
+						cin >> diceNum;
+
+						for (diceNum; diceNum > 0; diceNum--)
+						{
+							attackerDiceRolls += rand() % 6 + 1;
+						}
+
+						cout << "\nPlayer " << defendingRegion->playerInControl << ", pick a number of up to " << attackingRegion->numOfArmies << " dice to attack!\n";
+
+						cin >> diceNum;
+
+						for (diceNum; diceNum > 0; diceNum--)
+						{
+							defenderDiceRolls += rand() % 6 + 1;
+						}
+
+						if (attackerDiceRolls > defenderDiceRolls)
+						{
+							cout << "\nPlayer " << (playerTurn + 1) << " wins! Player " << defendingRegion->playerInControl << " loses an army.\n";
+							defendingRegion->numOfArmies -= 1;
+						}
+						else
+						{
+							cout << "\nPlayer " << defendingRegion->playerInControl << " wins! Player " << (playerTurn + 1) << " loses an army.\n";
+							attackingRegion->numOfArmies -= 1;
+						}
+					}
+				}
+
+				if (defendingRegion->numOfArmies == 0)
+				{
+					cout << "\n" << defendingRegion->name << " successfully taken!\n";
+					defendingRegion->playerInControl = (playerTurn + 1);
+
+					for (Territory* i : players[0]->territories)
+					{
+						for (Regions* j : i->regions)
+						{
+							if (j == defendingRegion)
+							{
+								TerritoryToRemoveFrom = defendingRegion->returnOwnedTerritory();
+								auto element = find(TerritoryToRemoveFrom->regions.begin(), TerritoryToRemoveFrom->regions.end(), j);
+								int index = element - TerritoryToRemoveFrom->regions.begin();
+
+								TerritoryToRemoveFrom->regions.erase(TerritoryToRemoveFrom->regions.begin() + index);
+							}
+						}
+					}
+
+					defendingRegion->SetOwnedTerritory(attackingRegion->returnOwnedTerritory());
+					attackingRegion->returnOwnedTerritory()->regions.insert(attackingRegion->returnOwnedTerritory()->regions.end(), defendingRegion);
+				}
+			}
+			else
+			{
+				cout << "You don't have enough armies in any region. Skipping to Fortification phase.\n";
+				skippedAttackPhase = true;
+			}
+
+			break;
+		case 1:
+			hasEnoughArmies = false;
+
+			cout << "Choose which of these countries you wish to attack with:\n";
+
+			for (Territory* i : players[1]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					if (j->numOfArmies > 1)
+					{
+						cout << j->name << endl;
+						hasEnoughArmies = true;
+					}
+				}
+			}
+
+			if (hasEnoughArmies == true)
+			{
+				cin >> chosenRegion;
+
+				for (Territory* i : players[1]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						if (j->name == chosenRegion)
+						{
+							attackingRegion = j;
+						}
+					}
+				}
+
+				enemyRegionsAround = 0;
+
+				for (Regions* i : attackingRegion->adjacentRegions)
+				{
+					if (i->playerInControl != attackingRegion->playerInControl)  ////// ISSUE IS AROUND HERE BILAL
+					{
+						enemyRegionsAround += 1;
+					}
+				}
+
+				if (enemyRegionsAround == 0)
+				{
+					cout << "\nThere are no enemy countries near your chosen country, skipping to the Fortification phase.\n";
+					skippedAttackPhase = true;
+					break;
+				}
+
+				for (Territory* i : players[1]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						if (j->name == chosenRegion)
+						{
+							cout << "Choose an adjacent enemy country to attack:\n";
+
+							for (Regions* k : j->adjacentRegions)
+							{
+								if (k->playerInControl != 2)
+								{
+									cout << k->name << endl;
+								}
+							}
+						}
+					}
+				}
+
+				cin >> chosenRegion;
+
+				for (Territory* i : players[1]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						for (Regions* k : j->adjacentRegions)
+						{
+							if (k->name == chosenRegion)
+							{
+								defendingRegion = k;
+							}
+						}
+					}
+				}
+
+				if (defendingRegion->numOfArmies == 0)
+				{
+					cout << "\n" << defendingRegion->name << " successfully taken!\n";
+					defendingRegion->playerInControl = (playerTurn + 1);
+
+					for (Territory* i : players[1]->territories)
+					{
+						for (Regions* j : i->regions)
+						{
+							if (j == defendingRegion)
+							{
+								TerritoryToRemoveFrom = defendingRegion->returnOwnedTerritory();
+								auto element = find(TerritoryToRemoveFrom->regions.begin(), TerritoryToRemoveFrom->regions.end(), j);
+								int index = element - TerritoryToRemoveFrom->regions.begin();
+
+								TerritoryToRemoveFrom->regions.erase(TerritoryToRemoveFrom->regions.begin() + index);
+							}
+						}
+					}
+
+					defendingRegion->SetOwnedTerritory(attackingRegion->returnOwnedTerritory());
+					attackingRegion->returnOwnedTerritory()->regions.insert(attackingRegion->returnOwnedTerritory()->regions.end(), defendingRegion);
+
+				}
+				else
+				{
+					while (defendingRegion->numOfArmies != 0 || attackingRegion->numOfArmies != 0)
+					{
+						cout << "\nPlayer " << (playerTurn + 1) << ", pick a number of up to 3 dice to attack!\n";
+
+						cin >> diceNum;
+
+						for (diceNum; diceNum > 0; diceNum--)
+						{
+							attackerDiceRolls += rand() % 6 + 1;
+						}
+
+						cout << "\nPlayer " << defendingRegion->playerInControl << ", pick a number of up to " << attackingRegion->numOfArmies << " dice to attack!\n";
+
+						cin >> diceNum;
+
+						for (diceNum; diceNum > 0; diceNum--)
+						{
+							defenderDiceRolls += rand() % 6 + 1;
+						}
+
+						if (attackerDiceRolls > defenderDiceRolls)
+						{
+							cout << "\nPlayer " << (playerTurn + 1) << " wins! Player " << defendingRegion->playerInControl << " loses an army.\n";
+							defendingRegion->numOfArmies -= 1;
+						}
+						else
+						{
+							cout << "\nPlayer " << defendingRegion->playerInControl << " wins! Player " << (playerTurn + 1) << " loses an army.\n";
+							attackingRegion->numOfArmies -= 1;
+						}
+					}
+				}
+
+				if (defendingRegion->numOfArmies == 0)
+				{
+					cout << "\n" << defendingRegion->name << " successfully taken!\n";
+					defendingRegion->playerInControl = (playerTurn + 1);
+
+					for (Territory* i : players[1]->territories)
+					{
+						for (Regions* j : i->regions)
+						{
+							if (j == defendingRegion)
+							{
+								TerritoryToRemoveFrom = defendingRegion->returnOwnedTerritory();
+								auto element = find(TerritoryToRemoveFrom->regions.begin(), TerritoryToRemoveFrom->regions.end(), j);
+								int index = element - TerritoryToRemoveFrom->regions.begin();
+
+								TerritoryToRemoveFrom->regions.erase(TerritoryToRemoveFrom->regions.begin() + index);
+							}
+						}
+					}
+
+					defendingRegion->SetOwnedTerritory(attackingRegion->returnOwnedTerritory());
+					attackingRegion->returnOwnedTerritory()->regions.insert(attackingRegion->returnOwnedTerritory()->regions.end(), defendingRegion);
+				}
+			}
+			else
+			{
+				cout << "You don't have enough armies in any region. Skipping to Fortification phase.\n";
+				skippedAttackPhase = true;
+			}
+
+			break;
+		case 2:
+			hasEnoughArmies = false;
+
+			cout << "Choose which of these countries you wish to attack with:\n";
+
+			for (Territory* i : players[2]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					if (j->numOfArmies > 1)
+					{
+						cout << j->name << endl;
+						hasEnoughArmies = true;
+					}
+				}
+			}
+
+			if (hasEnoughArmies == true)
+			{
+				cin >> chosenRegion;
+
+				for (Territory* i : players[2]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						if (j->name == chosenRegion)
+						{
+							attackingRegion = j;
+						}
+					}
+				}
+
+				enemyRegionsAround = 0;
+
+				for (Regions* i : attackingRegion->adjacentRegions)
+				{
+					cout << "\n" << i->name << endl;
+
+					if (i->playerInControl != attackingRegion->playerInControl)  ////// ISSUE IS AROUND HERE BILAL
+					{
+						cout << "\n" << attackingRegion->playerInControl << endl;
+						enemyRegionsAround += 1;
+					}
+				}
+
+				if (enemyRegionsAround == 0)
+				{
+					cout << "\nThere are no enemy countries near your chosen country, skipping to the Fortification phase.\n";
+					skippedAttackPhase = true;
+					break;
+				}
+
+				for (Territory* i : players[2]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						if (j->name == chosenRegion)
+						{
+							cout << "Choose an adjacent enemy country to attack:\n";
+
+							for (Regions* k : j->adjacentRegions)
+							{
+								if (k->playerInControl != 3)
+								{
+									cout << k->name << endl;
+								}
+							}
+						}
+					}
+				}
+
+				cin >> chosenRegion;
+
+				for (Territory* i : players[2]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						for (Regions* k : j->adjacentRegions)
+						{
+							if (k->name == chosenRegion)
+							{
+								defendingRegion = k;
+							}
+						}
+					}
+				}
+
+				if (defendingRegion->numOfArmies == 0)
+				{
+					cout << "\n" << defendingRegion->name << " successfully taken!\n";
+					defendingRegion->playerInControl = (playerTurn + 1);
+
+					for (Territory* i : players[2]->territories)
+					{
+						for (Regions* j : i->regions)
+						{
+							if (j == defendingRegion)
+							{
+								TerritoryToRemoveFrom = defendingRegion->returnOwnedTerritory();
+								auto element = find(TerritoryToRemoveFrom->regions.begin(), TerritoryToRemoveFrom->regions.end(), j);
+								int index = element - TerritoryToRemoveFrom->regions.begin();
+
+								TerritoryToRemoveFrom->regions.erase(TerritoryToRemoveFrom->regions.begin() + index);
+							}
+						}
+					}
+
+					defendingRegion->SetOwnedTerritory(attackingRegion->returnOwnedTerritory());
+					attackingRegion->returnOwnedTerritory()->regions.insert(attackingRegion->returnOwnedTerritory()->regions.end(), defendingRegion);
+
+				}
+				else
+				{
+					while (defendingRegion->numOfArmies != 0 || attackingRegion->numOfArmies != 0)
+					{
+						cout << "\nPlayer " << (playerTurn + 1) << ", pick a number of up to 3 dice to attack!\n";
+
+						cin >> diceNum;
+
+						for (diceNum; diceNum > 0; diceNum--)
+						{
+							attackerDiceRolls += rand() % 6 + 1;
+						}
+
+						cout << "\nPlayer " << defendingRegion->playerInControl << ", pick a number of up to " << attackingRegion->numOfArmies << " dice to attack!\n";
+
+						cin >> diceNum;
+
+						for (diceNum; diceNum > 0; diceNum--)
+						{
+							defenderDiceRolls += rand() % 6 + 1;
+						}
+
+						if (attackerDiceRolls > defenderDiceRolls)
+						{
+							cout << "\nPlayer " << (playerTurn + 1) << " wins! Player " << defendingRegion->playerInControl << " loses an army.\n";
+							defendingRegion->numOfArmies -= 1;
+						}
+						else
+						{
+							cout << "\nPlayer " << defendingRegion->playerInControl << " wins! Player " << (playerTurn + 1) << " loses an army.\n";
+							attackingRegion->numOfArmies -= 1;
+						}
+					}
+				}
+
+				if (defendingRegion->numOfArmies == 0)
+				{
+					cout << "\n" << defendingRegion->name << " successfully taken!\n";
+					defendingRegion->playerInControl = (playerTurn + 1);
+
+					for (Territory* i : players[2]->territories)
+					{
+						for (Regions* j : i->regions)
+						{
+							if (j == defendingRegion)
+							{
+								TerritoryToRemoveFrom = defendingRegion->returnOwnedTerritory();
+								auto element = find(TerritoryToRemoveFrom->regions.begin(), TerritoryToRemoveFrom->regions.end(), j);
+								int index = element - TerritoryToRemoveFrom->regions.begin();
+
+								TerritoryToRemoveFrom->regions.erase(TerritoryToRemoveFrom->regions.begin() + index);
+							}
+						}
+					}
+
+					defendingRegion->SetOwnedTerritory(attackingRegion->returnOwnedTerritory());
+					attackingRegion->returnOwnedTerritory()->regions.insert(attackingRegion->returnOwnedTerritory()->regions.end(), defendingRegion);
+				}
+			}
+			else
+			{
+				cout << "You don't have enough armies in any region. Skipping to Fortification phase.\n";
+				skippedAttackPhase = true;
+			}
+
+			break;
+		case 3:
+			hasEnoughArmies = false;
+
+			cout << "Choose which of these countries you wish to attack with:\n";
+
+			for (Territory* i : players[3]->territories)
+			{
+				for (Regions* j : i->regions)
+				{
+					if (j->numOfArmies > 1)
+					{
+						cout << j->name << endl;
+						hasEnoughArmies = true;
+					}
+				}
+			}
+
+			if (hasEnoughArmies == true)
+			{
+				cin >> chosenRegion;
+
+				for (Territory* i : players[3]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						if (j->name == chosenRegion)
+						{
+							attackingRegion = j;
+						}
+					}
+				}
+
+				enemyRegionsAround = 0;
+
+				for (Regions* i : attackingRegion->adjacentRegions)
+				{
+					if (i->playerInControl != attackingRegion->playerInControl)  ////// ISSUE IS AROUND HERE BILAL
+					{
+						enemyRegionsAround += 1;
+					}
+				}
+
+				if (enemyRegionsAround == 0)
+				{
+					cout << "\nThere are no enemy countries near your chosen country, skipping to the Fortification phase.\n";
+					skippedAttackPhase = true;
+					break;
+				}
+
+				for (Territory* i : players[3]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						if (j->name == chosenRegion)
+						{
+							cout << "Choose an adjacent enemy country to attack:\n";
+
+							for (Regions* k : j->adjacentRegions)
+							{
+								if (k->playerInControl != 4)
+								{
+									cout << k->name << endl;
+								}
+							}
+						}
+					}
+				}
+
+				cin >> chosenRegion;
+
+				for (Territory* i : players[3]->territories)
+				{
+					for (Regions* j : i->regions)
+					{
+						for (Regions* k : j->adjacentRegions)
+						{
+							if (k->name == chosenRegion)
+							{
+								defendingRegion = k;
+							}
+						}
+					}
+				}
+
+				if (defendingRegion->numOfArmies == 0)
+				{
+					cout << "\n" << defendingRegion->name << " successfully taken!\n";
+					defendingRegion->playerInControl = (playerTurn + 1);
+
+					for (Territory* i : players[3]->territories)
+					{
+						for (Regions* j : i->regions)
+						{
+							if (j == defendingRegion)
+							{
+								TerritoryToRemoveFrom = defendingRegion->returnOwnedTerritory();
+								auto element = find(TerritoryToRemoveFrom->regions.begin(), TerritoryToRemoveFrom->regions.end(), j);
+								int index = element - TerritoryToRemoveFrom->regions.begin();
+
+								TerritoryToRemoveFrom->regions.erase(TerritoryToRemoveFrom->regions.begin() + index);
+							}
+						}
+					}
+
+					defendingRegion->SetOwnedTerritory(attackingRegion->returnOwnedTerritory());
+					attackingRegion->returnOwnedTerritory()->regions.insert(attackingRegion->returnOwnedTerritory()->regions.end(), defendingRegion);
+
+				}
+				else
+				{
+					while (defendingRegion->numOfArmies != 0 || attackingRegion->numOfArmies != 0)
+					{
+						cout << "\nPlayer " << (playerTurn + 1) << ", pick a number of up to 3 dice to attack!\n";
+
+						cin >> diceNum;
+
+						for (diceNum; diceNum > 0; diceNum--)
+						{
+							attackerDiceRolls += rand() % 6 + 1;
+						}
+
+						cout << "\nPlayer " << defendingRegion->playerInControl << ", pick a number of up to " << attackingRegion->numOfArmies << " dice to attack!\n";
+
+						cin >> diceNum;
+
+						for (diceNum; diceNum > 0; diceNum--)
+						{
+							defenderDiceRolls += rand() % 6 + 1;
+						}
+
+						if (attackerDiceRolls > defenderDiceRolls)
+						{
+							cout << "\nPlayer " << (playerTurn + 1) << " wins! Player " << defendingRegion->playerInControl << " loses an army.\n";
+							defendingRegion->numOfArmies -= 1;
+						}
+						else
+						{
+							cout << "\nPlayer " << defendingRegion->playerInControl << " wins! Player " << (playerTurn + 1) << " loses an army.\n";
+							attackingRegion->numOfArmies -= 1;
+						}
+					}
+				}
+
+				if (defendingRegion->numOfArmies == 0)
+				{
+					cout << "\n" << defendingRegion->name << " successfully taken!\n";
+					defendingRegion->playerInControl = (playerTurn + 1);
+
+					for (Territory* i : players[3]->territories)
+					{
+						for (Regions* j : i->regions)
+						{
+							if (j == defendingRegion)
+							{
+								TerritoryToRemoveFrom = defendingRegion->returnOwnedTerritory();
+								auto element = find(TerritoryToRemoveFrom->regions.begin(), TerritoryToRemoveFrom->regions.end(), j);
+								int index = element - TerritoryToRemoveFrom->regions.begin();
+
+								TerritoryToRemoveFrom->regions.erase(TerritoryToRemoveFrom->regions.begin() + index);
+							}
+						}
+					}
+
+					defendingRegion->SetOwnedTerritory(attackingRegion->returnOwnedTerritory());
+					attackingRegion->returnOwnedTerritory()->regions.insert(attackingRegion->returnOwnedTerritory()->regions.end(), defendingRegion);
+				}
+			}
+			else
+			{
+				cout << "You don't have enough armies in any region. Skipping to Fortification phase.\n";
+				skippedAttackPhase = true;
+			}
+
+			break;
+	}
+}
+
+void Player::Fortificate()
+{
+	cout << "\nfortify";
 }

@@ -4,6 +4,8 @@
 
 using namespace std;
 
+class Territory;
+
 class Regions
 {
 	public:
@@ -11,7 +13,18 @@ class Regions
 		int numOfArmies = 0;
 		int playerInControl;
 
+		Territory* ownedTerritory;
 		vector<Regions*> adjacentRegions;
+
+		Territory* returnOwnedTerritory()
+		{
+			return ownedTerritory;
+		}
+
+		void SetOwnedTerritory(Territory* inputTerritory)
+		{
+			ownedTerritory = inputTerritory;
+		}
 };
 
 class Territory 
