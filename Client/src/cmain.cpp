@@ -213,10 +213,19 @@ void Start()
 		}
 	}
 
+<<<<<<< Updated upstream
 	for (Territory* i : territories)
 	{
 		cout << i->playerInControl << '\n';
 	}
+=======
+	// Checking to see that territories are properly assigned.
+
+	/*for (Territory* i : territories)
+	{
+		cout << i->playerInControl << '\n';
+	}*/
+>>>>>>> Stashed changes
 
 	CreateBoard();
 }
