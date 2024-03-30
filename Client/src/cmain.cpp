@@ -9,6 +9,7 @@
 #include "IO/FileReader.h"
 #include "Player/Player.h"
 #include "time.h"
+#include "Card/Card.h"
 
 using namespace std;
 
@@ -23,6 +24,7 @@ int playerCount = 0;
 int playerTurn = 0;
 
 std::vector<Territory*> territories;
+std::vector<Continent*> continents;
 vector<Player> players;
 
 void SetUpTerritories(std::vector<float> bufferData, std::vector<int> indices) 
@@ -298,12 +300,16 @@ void SetUpTerritories(std::vector<float> bufferData, std::vector<int> indices)
 	easternUS_Terr->SetAdjacency({ westernUS_Terr, ontario_Terr, quebec_Terr, centralAmerica_Terr});
 	centralAmerica_Terr->SetAdjacency({ westernUS_Terr, easternUS_Terr, venezuela_Terr });
 
+	continents.push_back(new Continent({alaska_Terr, nwTerritories_Terr, alberta_Terr, ontario_Terr, quebec_Terr, greenland_Terr, westernUS_Terr, easternUS_Terr, centralAmerica_Terr}, 5));
+
 	//South America adjacencies
 	venezuela_Terr->SetAdjacency({ centralAmerica_Terr, peru_Terr, brazil_Terr});
 	peru_Terr->SetAdjacency({ venezuela_Terr, argentina_Terr, brazil_Terr});
 	argentina_Terr->SetAdjacency({ peru_Terr, brazil_Terr});
 	brazil_Terr->SetAdjacency({ peru_Terr, venezuela_Terr, argentina_Terr, northAfrica_Terr});
-	
+
+	continents.push_back(new Continent({ venezuela_Terr, peru_Terr, argentina_Terr, brazil_Terr}, 3));
+
 	//Africa adjacencies
 	northAfrica_Terr->SetAdjacency({ brazil_Terr, westernEU_Terr, southernEU_Terr, egypt_Terr, congo_Terr, eastAfrica_Terr});
 	egypt_Terr->SetAdjacency({ northAfrica_Terr, southernEU_Terr, middleEast_Terr, eastAfrica_Terr});
@@ -312,6 +318,8 @@ void SetUpTerritories(std::vector<float> bufferData, std::vector<int> indices)
 	southAfrica_Terr->SetAdjacency({ congo_Terr, eastAfrica_Terr, madagascar_Terr});
 	madagascar_Terr->SetAdjacency({ southAfrica_Terr, eastAfrica_Terr});
 	
+	continents.push_back(new Continent({ northAfrica_Terr, egypt_Terr, eastAfrica_Terr, congo_Terr, southAfrica_Terr, madagascar_Terr }, 6));
+
 	//Europe adjacencies
 	iceland_Terr->SetAdjacency({greenland_Terr, scandinavia_Terr, uk_Terr});
 	scandinavia_Terr->SetAdjacency({ iceland_Terr, northernEU_Terr, uk_Terr, ukraine_Terr});
@@ -320,6 +328,8 @@ void SetUpTerritories(std::vector<float> bufferData, std::vector<int> indices)
 	northernEU_Terr->SetAdjacency({ uk_Terr, westernEU_Terr, southernEU_Terr, ukraine_Terr, scandinavia_Terr});
 	southernEU_Terr->SetAdjacency({ westernEU_Terr, northernEU_Terr, ukraine_Terr, northAfrica_Terr, egypt_Terr, middleEast_Terr});
 	ukraine_Terr->SetAdjacency({ scandinavia_Terr, northernEU_Terr, southernEU_Terr, middleEast_Terr, afghanistan_Terr, ural_Terr });
+
+	continents.push_back(new Continent({ iceland_Terr, scandinavia_Terr, uk_Terr, westernEU_Terr, northernEU_Terr, southernEU_Terr, ukraine_Terr}, 6));
 
 	//Asia adjacencies
 	middleEast_Terr->SetAdjacency({ southernEU_Terr, egypt_Terr, eastAfrica_Terr, india_Terr, afghanistan_Terr, ukraine_Terr });
@@ -335,11 +345,15 @@ void SetUpTerritories(std::vector<float> bufferData, std::vector<int> indices)
 	india_Terr->SetAdjacency({ middleEast_Terr, afghanistan_Terr, china_Terr, siam_Terr });
 	siam_Terr->SetAdjacency({ india_Terr, china_Terr, indonesia_Terr });
 
+	continents.push_back(new Continent({ middleEast_Terr, afghanistan_Terr, ural_Terr, siberia_Terr, yakutsk_Terr, kamchatka_Terr, japan_Terr, irkutsk_Terr, mongolia_Terr, china_Terr, india_Terr, siam_Terr }, 8));
+
 	//Oceania adjacencies
 	indonesia_Terr->SetAdjacency({ siam_Terr, newGuinea_Terr, westernAustrallia_Terr });
 	newGuinea_Terr->SetAdjacency({ indonesia_Terr, westernAustrallia_Terr, easternAustrallia_Terr });
 	westernAustrallia_Terr->SetAdjacency({ indonesia_Terr, easternAustrallia_Terr, newGuinea_Terr });
 	easternAustrallia_Terr->SetAdjacency({westernAustrallia_Terr, newGuinea_Terr });
+
+	continents.push_back(new Continent({ indonesia_Terr, newGuinea_Terr, westernAustrallia_Terr, easternAustrallia_Terr }, 3));
 }
 
 void LogTerritoryInfo(int playerIndex) 
@@ -368,6 +382,19 @@ void LogTerritoryAdjacencyInfo(int territoryIndex, int playerIndex)
 void GiveTroops(int playerIndex) 
 {
 	players[playerIndex].undeployedArmies = floor(players[playerIndex].territoryCount / 3.0f);
+
+	for (int i = 0; i < continents.size(); i++)
+	{
+		int numberOfContinentTerritories = 0;
+		for (int v = 0; v < continents[i]->territories.size(); v++)
+		{
+			if (continents[i]->territories[v]->playerInControl == playerIndex)
+				numberOfContinentTerritories++;
+		}
+
+		if (numberOfContinentTerritories == continents[i]->territories.size())
+			players[playerIndex].undeployedArmies += continents[i]->armyBonus;
+	}
 }
 
 void ReinforcePhase(int playerIndex) 
@@ -510,6 +537,8 @@ void AttackPhase(int playerIndex)
 			territories[attackToTerritory]->numArmies = attackerArmies;
 
 			std::cout << "Attack success, Player " << playerIndex << " now owns " << territories[attackToTerritory]->name << "\n";
+			players[playerIndex].cards.push_back(new Card());
+			players[playerIndex].cards[players[playerIndex].cards.size() - 1]->type = CardType(rand() % 2);
 		}
 		else
 		{

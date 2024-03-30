@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <vector>
+#include "../Card/Card.h"
 
 class Player
 {
@@ -13,4 +14,5 @@ public:
     bool isTurn;
     int undeployedArmies;
     int territoryCount;
+    std::vector<Card*> cards;
 };

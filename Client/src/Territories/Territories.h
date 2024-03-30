@@ -7,6 +7,16 @@
 const std::string player1Occupied = "Player1Occupied";
 const std::string player0Occupied = "Player0Occupied";
 
+class Territory;
+
+class Continent 
+{
+public:
+	Continent(std::vector<Territory*> territories, int armyBonus) : territories(territories), armyBonus(armyBonus){}
+	std::vector<Territory*> territories;
+	int armyBonus;
+};
+
 class Territory 
 {
 public:
