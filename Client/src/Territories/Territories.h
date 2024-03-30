@@ -15,11 +15,12 @@ public:
 	{}
 
 	void SetAdjacency(std::vector<Territory*> adjacencies) { adjacentTerritories = adjacencies; }
-	void SetPlayerInControl(int player) { playerInControl = player; }
 	void Draw(Shader shader);
 private:
-	std::vector<Territory*> adjacentTerritories;
+	Mesh meshRepresentation;
+public:
+	int numArmies;
 	std::string name;
 	int playerInControl;
-	Mesh meshRepresentation;
+	std::vector<Territory*> adjacentTerritories;
 };

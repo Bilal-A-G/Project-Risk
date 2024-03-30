@@ -342,6 +342,182 @@ void SetUpTerritories(std::vector<float> bufferData, std::vector<int> indices)
 	easternAustrallia_Terr->SetAdjacency({westernAustrallia_Terr, newGuinea_Terr });
 }
 
+void LogTerritoryInfo(int playerIndex) 
+{
+	for (int i = 0; i < territories.size(); i++)
+	{
+		Territory* territory = territories[i];
+		if (territory->playerInControl != playerIndex)
+			continue;
+
+		std::cout << "Player " << playerIndex << " Index = " << i  << " -  Name = " << territory->name << " Army count = " << territory->numArmies << "\n";
+	}
+}
+
+void LogTerritoryAdjacencyInfo(int territoryIndex, int playerIndex)
+{
+	for (int i = 0; i < territories[territoryIndex]->adjacentTerritories.size(); i++)
+	{
+		if (territories[territoryIndex]->adjacentTerritories[i]->playerInControl == playerIndex)
+			continue;
+
+		std::cout << "Player " << playerIndex << " Index = " << i << " -  Name = " << territories[territoryIndex]->adjacentTerritories[i]->name << " Army count = " << territories[territoryIndex]->adjacentTerritories[i]->numArmies << "\n";
+	}
+}
+
+void GiveTroops(int playerIndex) 
+{
+	players[playerIndex].undeployedArmies = floor(players[playerIndex].territoryCount / 3.0f);
+}
+
+void ReinforcePhase(int playerIndex) 
+{
+	while (players[playerIndex].undeployedArmies > 0)
+	{
+		std::cout << "Player " << playerIndex << "'s turn : Reinforcement " << "--Place your troops on a territory (Type in an index)--" << "\n";
+		LogTerritoryInfo(playerIndex);
+
+		int index;
+		std::cin >> index;
+
+		std::cout << "How many troops to place? (Type in a number)" << "Max troops = " << players[playerIndex].undeployedArmies << "\n";
+		int troopCount;
+		std::cin >> troopCount;
+
+		if (troopCount > players[playerIndex].undeployedArmies)
+			troopCount = players[playerIndex].undeployedArmies;
+		if (troopCount < 0)
+			troopCount = 0;
+
+		territories[index]->numArmies += troopCount;
+		players[playerIndex].undeployedArmies -= troopCount;
+	}
+}
+
+void FortificationPhase(int playerIndex)
+{
+	while (true)
+	{
+		std::cout << "Player " << playerIndex << "'s turn : Fortification " << "--Take troops from a territory (Type in an index, or type -1 to stop)--" << "\n";
+		LogTerritoryInfo(playerIndex);
+
+		int transferFromTerritory = 0;
+		std::cin >> transferFromTerritory;
+
+		if (transferFromTerritory == -1)
+			break;
+
+		std::cout << "How many troops to take? (Type in a number)" << "Max troops = " << territories[transferFromTerritory]->numArmies - 1 << "\n";
+		int numArmies = 0;
+		std::cin >> numArmies;
+
+		if (numArmies > territories[transferFromTerritory]->numArmies - 1)
+			numArmies = territories[transferFromTerritory]->numArmies - 1;
+
+		if (numArmies < 0)
+			numArmies = 0;
+
+		std::cout << "Where to transfer them to? (Type in an index)"<< "\n";
+		LogTerritoryInfo(playerIndex);
+		
+		int transferToTerritory = 0;
+		std::cin >> transferToTerritory;
+		
+		territories[transferFromTerritory]->numArmies -= numArmies;
+		territories[transferToTerritory]->numArmies += numArmies;
+	}
+}
+
+void AttackPhase(int playerIndex)
+{
+	while (true)
+	{
+		int numTerritoriesWithNoTroops = 0;
+		for (int i = 0; i < territories.size(); i++)
+		{
+			if (territories[i]->playerInControl != playerIndex)
+				continue;
+
+			if (territories[i]->numArmies == 1) 
+				numTerritoriesWithNoTroops++;
+		}
+		if (numTerritoriesWithNoTroops == players[playerIndex].territoryCount)
+			break;
+
+		std::cout << "Player " << playerIndex << "'s turn : Attack " << "--Select a territory (Type in an index, or type -1 to stop)--" << "\n";
+		LogTerritoryInfo(playerIndex);
+
+		int attackFromTerritory = 0;
+		std::cin >> attackFromTerritory;
+
+		if (attackFromTerritory == -1)
+			break;
+
+		std::cout << "How many troops to take? (Type in a number)" << "Max troops = " << territories[attackFromTerritory]->numArmies - 1 << "\n";
+		int numArmies = 0;
+		std::cin >> numArmies;
+
+		if (numArmies > territories[attackFromTerritory]->numArmies - 1)
+			numArmies = territories[attackFromTerritory]->numArmies - 1;
+
+		if (numArmies < 0)
+			numArmies = 0;
+
+		std::cout << "Where to attack (Type in an index)" << "\n";
+		LogTerritoryAdjacencyInfo(attackFromTerritory, playerIndex);
+
+		int attackToTerritory = 0;
+		std::cin >> attackToTerritory;
+
+		if (attackToTerritory == -1)
+			break;
+
+		int attackerArmies = numArmies;
+		int defenderArmies = territories[attackToTerritory]->numArmies;
+		territories[attackFromTerritory]->numArmies -= attackerArmies;
+
+		while (attackerArmies != 0 && defenderArmies != 0)
+		{
+			int defenderDice = defenderArmies > 2 ? 3 : defenderArmies;
+			int attackerDice = attackerArmies > 2 ? 3 : attackerArmies;
+
+			int maxDefenderRoll = 0;
+			int maxAttackerRoll = 0;
+
+			for (int i = 0; i < defenderDice; i++)
+			{
+				int roll = rand() % 6 + 1;
+				if (maxDefenderRoll < roll)
+					maxDefenderRoll = roll;
+			}
+
+			for (int i = 0; i < attackerDice; i++)
+			{
+				int roll = rand() % 6 + 1;
+				if (maxAttackerRoll < roll)
+					maxAttackerRoll = roll;
+			}
+
+			if (maxDefenderRoll >= maxAttackerRoll)
+				attackerArmies--;
+			else
+				defenderArmies--;
+		}
+
+		if (attackerArmies > 0) 
+		{
+			territories[attackToTerritory]->playerInControl = playerIndex;
+			territories[attackToTerritory]->numArmies = attackerArmies;
+
+			std::cout << "Attack success, Player " << playerIndex << " now owns " << territories[attackToTerritory]->name << "\n";
+		}
+		else
+		{
+			std::cout << "Attack failed, Player " << playerIndex << " lost all their troops! \n";
+		}
+	}
+}
+
 void SetupWindow()
 {
 	mainWindow = new Window(width, height, "Window");
@@ -396,16 +572,86 @@ void Start()
 
 	for (int i = 0; i < playerCount; i++)
 	{
-		players.push_back(Player());
+		players.push_back(Player(40));
 	}
 
+	//Setting control and placing 1 troop down
 	for (Territory* territory : territories)
 	{
-		territory->SetPlayerInControl(rand() % playerCount);
+		int playerIndex = rand() % playerCount;
+		territory->playerInControl = playerIndex;
+		players[playerIndex].territoryCount++;
+		territory->numArmies = 1;
+		players[playerIndex].undeployedArmies--;
+	}
+
+	//Place some or all of remaining troops in all territories
+	for (int i = 0; i < territories.size(); i++)
+	{
+		Territory* territory = territories[i];
+
+		int playerIndex = territory->playerInControl;
+		int remainingArmies = players[playerIndex].undeployedArmies;
+		if (remainingArmies == 0)
+			continue;
+
+		int armiesToDeploy = i == territories.size() - 1 ? remainingArmies : rand() % 3 + 1;
+		if (armiesToDeploy > remainingArmies)
+			armiesToDeploy = remainingArmies;
+
+		territory->numArmies += armiesToDeploy;
+		players[playerIndex].undeployedArmies -= armiesToDeploy;
+	}
+
+	//Place extra troops down in first owned province
+	for (int i = 0; i < players.size(); i++)
+	{
+		for (Territory* territory : territories)
+		{
+			if (territory->playerInControl != i)
+				continue;
+
+			territory->numArmies += players[i].undeployedArmies;
+			players[i].undeployedArmies = 0;
+			break;
+		}
 	}
 }
 
 void Update() 
 {
-	UpdateWindow();
+	//UpdateWindow();
+	int numberDefeatedPlayers = 0;
+	bool gameWon = false;
+	while (!gameWon)
+	{
+		for (int i = 0; i < players.size(); i++)
+		{
+			if (players[i].territoryCount == 0)
+				numberDefeatedPlayers++;
+		}
+
+		if (numberDefeatedPlayers == players.size() - 1)
+		{
+			gameWon = true;
+			break;
+		}
+
+		for (int i = 0; i < players.size(); i++)
+		{
+			GiveTroops(i);
+			ReinforcePhase(i);
+			AttackPhase(i);
+			FortificationPhase(i);
+		}
+	}
+
+	for (int i = 0; i < players.size(); i++)
+	{
+		if (players[i].territoryCount > 0) 
+		{
+			std::cout << "Congratulations, you have won Player " << i << "\n";
+			break;
+		}
+	}
 }
