@@ -45,11 +45,11 @@ void Mesh::SetTexture(std::string texturePath)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
-        std::cout << "Successfully loaded image at " << TEXTURE_DIR + texturePath + TEXTURE_FILE_EXTENSION << "\n";
+        //std::cout << "Successfully loaded image at " << TEXTURE_DIR + texturePath + TEXTURE_FILE_EXTENSION << "\n";
     }
     else
     {
-        std::cout << "Failed to load image at " << TEXTURE_DIR + texturePath + TEXTURE_FILE_EXTENSION << "\n";
+        //std::cout << "Failed to load image at " << TEXTURE_DIR + texturePath + TEXTURE_FILE_EXTENSION << "\n";
     }
 
     stbi_image_free(data);

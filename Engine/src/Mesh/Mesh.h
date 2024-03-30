@@ -3,8 +3,7 @@
 #include <glm/vec3.hpp>
 #include "vector"
 #include "string";
-
-class Shader;
+#include "../Shader/Shader.h"
 
 class Mesh
 {
